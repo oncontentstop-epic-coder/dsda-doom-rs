@@ -16,12 +16,12 @@
 
 // MN_menu.c
 
-#include "doomstat.h"
-#include "w_wad.h"
-#include "v_video.h"
-#include "m_menu.h"
-#include "heretic/dstrings.h"
 #include "heretic/mn_menu.h"
+#include "doomstat.h"
+#include "heretic/dstrings.h"
+#include "m_menu.h"
+#include "v_video.h"
+#include "w_wad.h"
 
 #define ITEM_HEIGHT 20
 #define SELECTOR_XOFFSET (-28)
@@ -39,8 +39,7 @@ static int FontBBaseLump;
 static int SkullBaseLump;
 static int MenuTime;
 
-static void MN_InitFonts(void)
-{
+static void MN_InitFonts(void) {
   FontABaseLump = W_GetNumForName(DEH_String("FONTA_S")) + 1;
   FontBBaseLump = W_GetNumForName(DEH_String("FONTB_S")) + 1;
 }
@@ -62,8 +61,7 @@ extern short EpiMenuEpi[];
 
 void M_DrawThermo(int x, int y, int thermWidth, int thermDot);
 
-void MN_Init(void)
-{
+void MN_Init(void) {
   MN_InitFonts();
   SkullBaseLump = W_GetNumForName(DEH_String("M_SKL00"));
 
@@ -113,17 +111,14 @@ void MN_Init(void)
   SoundMenu[0].alttext = "SFX VOLUME";
   SoundMenu[2].alttext = "MUSIC VOLUME";
 
-  if (gamemode == retail)
-  {
+  if (gamemode == retail) {
     EpiMenuEpi[3] = 4;
     EpiMenuEpi[4] = 5;
     EpiMenuMap[3] = 1;
     EpiMenuMap[4] = 1;
     EpiDef.numitems = 5;
     EpiDef.y -= ITEM_HEIGHT;
-  }
-  else
-  {
+  } else {
     EpiMenuEpi[3] = -1;
     EpiMenuEpi[4] = -1;
     EpiMenuMap[3] = -1;
@@ -132,22 +127,19 @@ void MN_Init(void)
   }
 }
 
-void MN_Ticker(void)
-{
-    if (!menuactive)
-    {
-        return;
-    }
-    MenuTime++;
+void MN_Ticker(void) {
+  if (!menuactive) {
+    return;
+  }
+  MenuTime++;
 }
 
-extern menu_t* currentMenu;
+extern menu_t *currentMenu;
 extern short itemOn;
 extern int showMessages;
 extern int screenSize;
 
-void MN_DrawMessage(const char* messageString)
-{
+void MN_DrawMessage(const char *messageString) {
   char *msg;
   char *p;
   int y;
@@ -156,8 +148,7 @@ void MN_DrawMessage(const char* messageString)
   p = msg;
   y = 100 - MN_TextAHeight(msg) / 2;
 
-  while (*p)
-  {
+  while (*p) {
     char *text;
     char c;
 
@@ -175,20 +166,18 @@ void MN_DrawMessage(const char* messageString)
   free(msg);
 }
 
-void MN_Drawer(void)
-{
+void MN_Drawer(void) {
   int i;
   int x;
   int y;
   int max;
-  const char* selName;
+  const char *selName;
 
   x = currentMenu->x;
   y = currentMenu->y;
   max = currentMenu->numitems;
 
-  for (i = 0; i < max; i++)
-  {
+  for (i = 0; i < max; i++) {
     const char *text = currentMenu->menuitems[i].alttext;
     if (text)
       MN_DrTextB(DEH_String(text), x, y);
@@ -264,46 +253,41 @@ void MN_Drawer(void)
   // }
 }
 
-void MN_DrawMainMenu(void)
-{
+void MN_DrawMainMenu(void) {
   int frame;
 
   frame = (MenuTime / 3) % 18;
   V_DrawNamePatch(88, 0, 0, DEH_String("M_HTIC"), CR_DEFAULT, VPT_STRETCH);
-  V_DrawNumPatch(40, 10, 0, SkullBaseLump + (17 - frame), CR_DEFAULT, VPT_STRETCH);
+  V_DrawNumPatch(40, 10, 0, SkullBaseLump + (17 - frame), CR_DEFAULT,
+                 VPT_STRETCH);
   V_DrawNumPatch(232, 10, 0, SkullBaseLump + frame, CR_DEFAULT, VPT_STRETCH);
 }
 
-void MN_DrawOptions(void)
-{
-    if (showMessages)
-    {
-        MN_DrTextB(DEH_String("ON"), 196, OptionsDef.y + 3 * ITEM_HEIGHT);
-    }
-    else
-    {
-        MN_DrTextB(DEH_String("OFF"), 196, OptionsDef.y + 3 * ITEM_HEIGHT);
-    }
-    MN_DrawSlider(OptionsDef.x - 8, OptionsDef.y + ITEM_HEIGHT * SCREENSIZE_INDEX, 9, screenSize);
+void MN_DrawOptions(void) {
+  if (showMessages) {
+    MN_DrTextB(DEH_String("ON"), 196, OptionsDef.y + 3 * ITEM_HEIGHT);
+  } else {
+    MN_DrTextB(DEH_String("OFF"), 196, OptionsDef.y + 3 * ITEM_HEIGHT);
+  }
+  MN_DrawSlider(OptionsDef.x - 8, OptionsDef.y + ITEM_HEIGHT * SCREENSIZE_INDEX,
+                9, screenSize);
 }
 
-void MN_DrawSetup(void)
-{
+void MN_DrawSetup(void) {
   // nothing for heretic
 }
 
 extern int mouseSensitivity_mlook;
 extern int mouse_acceleration;
 
-void MN_DrawMouse(void)
-{
+void MN_DrawMouse(void) {
   MN_DrawSlider(MouseDef.x - 8, MouseDef.y + ITEM_HEIGHT * MOUSE_HORIZ_INDEX,
                 200, mouseSensitivity_horiz);
 
   MN_DrawSlider(MouseDef.x - 8, MouseDef.y + ITEM_HEIGHT * MOUSE_VERT_INDEX,
                 200, mouseSensitivity_vert);
 
-  //e6y
+  // e6y
   MN_DrawSlider(MouseDef.x - 8, MouseDef.y + ITEM_HEIGHT * MOUSE_MLOOK_INDEX,
                 200, mouseSensitivity_mlook);
 
@@ -311,29 +295,27 @@ void MN_DrawMouse(void)
                 200, mouse_acceleration);
 }
 
-void MN_DrawSound(void)
-{
-  MN_DrawSlider(SoundDef.x - 8, SoundDef.y + ITEM_HEIGHT * SFX_VOL_INDEX, 16, snd_SfxVolume);
+void MN_DrawSound(void) {
+  MN_DrawSlider(SoundDef.x - 8, SoundDef.y + ITEM_HEIGHT * SFX_VOL_INDEX, 16,
+                snd_SfxVolume);
 
-  MN_DrawSlider(SoundDef.x - 8, SoundDef.y + ITEM_HEIGHT * MUS_VOL_INDEX, 16, snd_MusicVolume);
+  MN_DrawSlider(SoundDef.x - 8, SoundDef.y + ITEM_HEIGHT * MUS_VOL_INDEX, 16,
+                snd_MusicVolume);
 }
 
 extern char savegamestrings[10][SAVESTRINGSIZE];
 
-static void MN_DrawFileSlots(int x, int y)
-{
+static void MN_DrawFileSlots(int x, int y) {
   int i;
 
-  for (i = 0; i < 6; i++)
-  {
+  for (i = 0; i < 6; i++) {
     V_DrawNamePatch(x, y, 0, DEH_String("M_FSLOT"), CR_DEFAULT, VPT_STRETCH);
     MN_DrTextA(savegamestrings[i], x + 5, y + 5);
     y += ITEM_HEIGHT;
   }
 }
 
-void MN_DrawLoad(void)
-{
+void MN_DrawLoad(void) {
   const char *title;
 
   title = DEH_String("LOAD GAME");
@@ -345,8 +327,7 @@ void MN_DrawLoad(void)
 extern int saveStringEnter;
 extern int saveSlot;
 
-void MN_DrawSave(void)
-{
+void MN_DrawSave(void) {
   const char *title;
 
   title = DEH_String("SAVE GAME");
@@ -354,37 +335,31 @@ void MN_DrawSave(void)
   MN_DrTextB(title, 160 - MN_TextBWidth(title) / 2, 10);
   MN_DrawFileSlots(SaveDef.x, SaveDef.y);
 
-  if (saveStringEnter)
-  {
+  if (saveStringEnter) {
     int i;
 
     i = MN_TextAWidth(savegamestrings[saveSlot]);
-    MN_DrTextA("[", SaveDef.x + 5 + i, SaveDef.y + 5 + saveSlot * ITEM_HEIGHT); // [ is _ in font A
+    MN_DrTextA("[", SaveDef.x + 5 + i,
+               SaveDef.y + 5 + saveSlot * ITEM_HEIGHT); // [ is _ in font A
   }
 }
 
-void MN_DrawPause(void)
-{
+void MN_DrawPause(void) {
   const char *title;
 
   title = "PAUSE";
   MN_DrTextB(title, 160 - MN_TextBWidth(title) / 2, 10);
 }
 
-void MN_DrTextA(const char *text, int x, int y)
-{
+void MN_DrTextA(const char *text, int x, int y) {
   char c;
   int lump;
 
-  while ((c = *text++) != 0)
-  {
+  while ((c = *text++) != 0) {
     c = toupper(c);
-    if (c < 33)
-    {
+    if (c < 33) {
       x += 5;
-    }
-    else
-    {
+    } else {
       lump = FontABaseLump + c - 33;
       V_DrawNumPatch(x, y, 0, lump, CR_DEFAULT, VPT_STRETCH);
       x += R_NumPatchWidth(lump) - 1;
@@ -392,8 +367,7 @@ void MN_DrTextA(const char *text, int x, int y)
   }
 }
 
-int MN_TextAHeight(const char *text)
-{
+int MN_TextAHeight(const char *text) {
   int i, line_height, total_height;
 
   line_height = R_NumPatchHeight(FontABaseLump);
@@ -405,22 +379,17 @@ int MN_TextAHeight(const char *text)
   return total_height;
 }
 
-int MN_TextAWidth(const char *text)
-{
+int MN_TextAWidth(const char *text) {
   char c;
   int width;
   int lump;
 
   width = 0;
-  while ((c = *text++) != 0)
-  {
+  while ((c = *text++) != 0) {
     c = toupper(c);
-    if (c < 33)
-    {
+    if (c < 33) {
       width += 5;
-    }
-    else
-    {
+    } else {
       lump = FontABaseLump + c - 33;
       width += R_NumPatchWidth(lump) - 1;
     }
@@ -428,20 +397,15 @@ int MN_TextAWidth(const char *text)
   return (width);
 }
 
-void MN_DrTextB(const char *text, int x, int y)
-{
+void MN_DrTextB(const char *text, int x, int y) {
   char c;
   int lump;
 
-  while ((c = *text++) != 0)
-  {
+  while ((c = *text++) != 0) {
     c = toupper(c);
-    if (c < 33)
-    {
+    if (c < 33) {
       x += 8;
-    }
-    else
-    {
+    } else {
       lump = FontBBaseLump + c - 33;
       V_DrawNumPatch(x, y, 0, lump, CR_DEFAULT, VPT_STRETCH);
       x += R_NumPatchWidth(lump) - 1;
@@ -449,22 +413,17 @@ void MN_DrTextB(const char *text, int x, int y)
   }
 }
 
-int MN_TextBWidth(const char *text)
-{
+int MN_TextBWidth(const char *text) {
   char c;
   int width;
   int lump;
 
   width = 0;
-  while ((c = *text++) != 0)
-  {
+  while ((c = *text++) != 0) {
     c = toupper(c);
-    if (c < 33)
-    {
+    if (c < 33) {
       width += 5;
-    }
-    else
-    {
+    } else {
       lump = FontBBaseLump + c - 33;
       width += R_NumPatchWidth(lump) - 1;
     }
@@ -476,8 +435,7 @@ int MN_TextBWidth(const char *text)
 #define SLIDER_WIDTH (SLIDER_LIMIT - 64)
 #define SLIDER_PATCH_COUNT (SLIDER_WIDTH / 8)
 
-void MN_DrawSlider(int x, int y, int width, int slot)
-{
+void MN_DrawSlider(int x, int y, int width, int slot) {
   int x2;
   int count;
   char num[4];
@@ -488,9 +446,8 @@ void MN_DrawSlider(int x, int y, int width, int slot)
 
   V_DrawNamePatch(x, y, 0, DEH_String("M_SLDLT"), CR_DEFAULT, VPT_STRETCH);
 
-  for (x2 = x + 32, count = SLIDER_PATCH_COUNT; count--; x2 += 8)
-  {
-    const char* name;
+  for (x2 = x + 32, count = SLIDER_PATCH_COUNT; count--; x2 += 8) {
+    const char *name;
 
     name = DEH_String(slider_img & 1 ? "M_SLDMD1" : "M_SLDMD2");
     slider_img ^= 1;
@@ -505,12 +462,12 @@ void MN_DrawSlider(int x, int y, int width, int slot)
   MN_DrTextA(num, x2 + 32, y + 3);
 
   // [crispy] do not crash anymore if the value is out of bounds
-  if (slot >= width)
-  {
+  if (slot >= width) {
     slot = width - 1;
   }
 
   slot_x = x + 36 + (SLIDER_WIDTH - 8) * slot / (width - 1);
 
-  V_DrawNamePatch(slot_x, y + 7, 0, DEH_String("M_SLDKB"), CR_DEFAULT, VPT_STRETCH);
+  V_DrawNamePatch(slot_x, y + 7, 0, DEH_String("M_SLDKB"), CR_DEFAULT,
+                  VPT_STRETCH);
 }

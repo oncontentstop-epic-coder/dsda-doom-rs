@@ -31,10 +31,10 @@ extern int playerkeys;
 // HERETIC_TODO: figure out if this should be removed or replaced
 extern dboolean BorderTopRefresh;
 
-#define TELEFOGHEIGHT (32*FRACUNIT)
-#define ANG1_X          0x01000000
+#define TELEFOGHEIGHT (32 * FRACUNIT)
+#define ANG1_X 0x01000000
 
-#define FOOTCLIPSIZE	10*FRACUNIT
+#define FOOTCLIPSIZE 10 * FRACUNIT
 
 #define FLOOR_SOLID 0
 #define FLOOR_WATER 1
@@ -56,7 +56,7 @@ extern dboolean BorderTopRefresh;
 
 #define TOCENTER -8
 
-#define BLINKTHRESHOLD (4*32)
+#define BLINKTHRESHOLD (4 * 32)
 
 #include "dstrings.h"
 

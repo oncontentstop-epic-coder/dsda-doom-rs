@@ -18,8 +18,8 @@
 #ifndef __DSDA_INPUT__
 #define __DSDA_INPUT__
 
-#include "doomtype.h"
 #include "d_event.h"
+#include "doomtype.h"
 
 #define DSDA_INPUT_PROFILE_COUNT 3
 #define NUMKEYS 512
@@ -156,37 +156,37 @@ typedef enum {
   DSDA_INPUT_IDENTIFIER_COUNT
 } dsda_input_identifier_t;
 
-typedef struct
-{
-  int* key;
+typedef struct {
+  int *key;
   int num_keys;
   int mouseb;
   int joyb;
 } dsda_input_t;
 
-typedef struct
-{
+typedef struct {
   int key;
   int mouseb;
   int joyb;
 } dsda_input_default_t;
 
 void dsda_InputFlushTick(void);
-void dsda_InputTrackEvent(event_t* ev);
-void dsda_InputTrackGameEvent(event_t* ev);
+void dsda_InputTrackEvent(event_t *ev);
+void dsda_InputTrackGameEvent(event_t *ev);
 dboolean dsda_InputActivated(int identifier);
 dboolean dsda_InputTickActivated(int identifier);
 dboolean dsda_InputDeactivated(int identifier);
-dsda_input_t* dsda_Input(int identifier);
+dsda_input_t *dsda_Input(int identifier);
 void dsda_InputFlush(void);
-void dsda_InputCopy(int identifier, dsda_input_t* input[DSDA_INPUT_PROFILE_COUNT]);
+void dsda_InputCopy(int identifier,
+                    dsda_input_t *input[DSDA_INPUT_PROFILE_COUNT]);
 int dsda_InputMatchKey(int identifier, int value);
 int dsda_InputMatchMouseB(int identifier, int value);
 int dsda_InputMatchJoyB(int identifier, int value);
 void dsda_InputReset(int identifier);
 void dsda_InputResetSpecific(int config_index, int identifier);
 void dsda_InputSet(int identifier, dsda_input_default_t input);
-void dsda_InputSetSpecific(int config_index, int identifier, dsda_input_default_t input);
+void dsda_InputSetSpecific(int config_index, int identifier,
+                           dsda_input_default_t input);
 void dsda_InputAddKey(int identifier, int value);
 void dsda_InputAddSpecificKey(int config_index, int identifier, int value);
 void dsda_InputAddMouseB(int identifier, int value);

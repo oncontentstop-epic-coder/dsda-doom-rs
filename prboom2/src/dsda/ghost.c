@@ -17,19 +17,19 @@
 
 #include <stdio.h>
 
-#include "m_argv.h"
-#include "lprintf.h"
-#include "doomtype.h"
 #include "doomstat.h"
+#include "doomtype.h"
 #include "info.h"
+#include "lprintf.h"
+#include "m_argv.h"
 #include "p_maputl.h"
 #include "p_tick.h"
 #include "sounds.h"
-#include "z_zone.h"
 #include "w_wad.h"
+#include "z_zone.h"
 
-#include "settings.h"
 #include "ghost.h"
+#include "settings.h"
 
 #define DSDA_GHOST_MIN_VERSION 1
 #define DSDA_GHOST_VERSION 2
@@ -48,54 +48,54 @@ typedef struct {
 
 typedef struct {
   dsda_ghost_frame_t frame;
-  mobj_t* mobj;
-  FILE* fstream;
+  mobj_t *mobj;
+  FILE *fstream;
 } dsda_ghost_t;
 
 typedef struct {
-  thinker_t* thinker;
-  dsda_ghost_t* ghosts;
+  thinker_t *thinker;
+  dsda_ghost_t *ghosts;
   int count;
 } dsda_ghost_import_t;
 
 typedef struct {
-  FILE* fstream;
+  FILE *fstream;
   int version;
   int count;
 } dsda_ghost_file_t;
 
 mobjinfo_t dsda_ghost_info = {
-  -1,            // doomednum
-  S_PLAY,        // spawnstate
-  0,             // spawnhealth
-  S_PLAY_RUN1,   // seestate
-  sfx_None,      // seesound
-  0,             // reactiontime
-  sfx_None,      // attacksound
-  S_PLAY_PAIN,   // painstate
-  0,             // painchance
-  sfx_None,      // painsound
-  S_NULL,        // meleestate
-  S_PLAY_ATK1,   // missilestate
-  S_PLAY_DIE1,   // deathstate
-  S_PLAY_XDIE1,  // xdeathstate
-  sfx_None,      // deathsound
-  0,             // speed
-  0,             // radius
-  0,             // height
-  0,             // mass
-  0,             // damage
-  sfx_None,      // activesound
-  MF_NOBLOCKMAP | MF_TRANSLUCENT, // flags
-  S_NULL         // raisestate
+    -1,                             // doomednum
+    S_PLAY,                         // spawnstate
+    0,                              // spawnhealth
+    S_PLAY_RUN1,                    // seestate
+    sfx_None,                       // seesound
+    0,                              // reactiontime
+    sfx_None,                       // attacksound
+    S_PLAY_PAIN,                    // painstate
+    0,                              // painchance
+    sfx_None,                       // painsound
+    S_NULL,                         // meleestate
+    S_PLAY_ATK1,                    // missilestate
+    S_PLAY_DIE1,                    // deathstate
+    S_PLAY_XDIE1,                   // xdeathstate
+    sfx_None,                       // deathsound
+    0,                              // speed
+    0,                              // radius
+    0,                              // height
+    0,                              // mass
+    0,                              // damage
+    sfx_None,                       // activesound
+    MF_NOBLOCKMAP | MF_TRANSLUCENT, // flags
+    S_NULL                          // raisestate
 };
 
 FILE *dsda_ghost_export;
 dsda_ghost_import_t dsda_ghost_import;
 
-void dsda_InitGhostExport(const char* name) {
+void dsda_InitGhostExport(const char *name) {
   int version;
-  char* filename;
+  char *filename;
   filename = malloc(strlen(name) + 4 + 1);
   AddDefaultExtension(strcpy(filename, name), ".gst");
 
@@ -110,8 +110,8 @@ void dsda_InitGhostExport(const char* name) {
   free(filename);
 }
 
-void dsda_OpenGhostFile(int arg_i, dsda_ghost_file_t* ghost_file) {
-  char* filename;
+void dsda_OpenGhostFile(int arg_i, dsda_ghost_file_t *ghost_file) {
+  char *filename;
 
   memset(ghost_file, 0, sizeof(dsda_ghost_file_t));
 
@@ -124,11 +124,15 @@ void dsda_OpenGhostFile(int arg_i, dsda_ghost_file_t* ghost_file) {
     I_Error("dsda_OpenGhostImport: failed to open %s", myargv[arg_i]);
 
   fread(&ghost_file->version, sizeof(int), 1, ghost_file->fstream);
-  if (ghost_file->version < DSDA_GHOST_MIN_VERSION || ghost_file->version > DSDA_GHOST_VERSION)
-    I_Error("dsda_OpenGhostImport: unsupported ghost version %s", myargv[arg_i]);
+  if (ghost_file->version < DSDA_GHOST_MIN_VERSION ||
+      ghost_file->version > DSDA_GHOST_VERSION)
+    I_Error("dsda_OpenGhostImport: unsupported ghost version %s",
+            myargv[arg_i]);
 
-  if (ghost_file->version == 1) ghost_file->count = 1;
-  else fread(&ghost_file->count, sizeof(int), 1, ghost_file->fstream);
+  if (ghost_file->version == 1)
+    ghost_file->count = 1;
+  else
+    fread(&ghost_file->count, sizeof(int), 1, ghost_file->fstream);
 
   free(filename);
 }
@@ -155,7 +159,8 @@ void dsda_InitGhostImport(int option_i) {
   while (++arg_i != myargc && *myargv[arg_i] != '-')
     dsda_ghost_import.count += dsda_GhostCount(arg_i);
 
-  dsda_ghost_import.ghosts = calloc(dsda_ghost_import.count, sizeof(dsda_ghost_t));
+  dsda_ghost_import.ghosts =
+      calloc(dsda_ghost_import.count, sizeof(dsda_ghost_t));
 
   arg_i = option_i;
   while (++arg_i != myargc && *myargv[arg_i] != '-') {
@@ -170,16 +175,19 @@ void dsda_InitGhostImport(int option_i) {
 
 void dsda_ExportGhostFrame(void) {
   dsda_ghost_frame_t ghost_frame;
-  mobj_t* player;
+  mobj_t *player;
   int i;
 
-  if (dsda_ghost_export == NULL) return;
+  if (dsda_ghost_export == NULL)
+    return;
 
   // just write the number of players on the zeroth tic
   if (gametic == 0) {
     int count = 0;
 
-    for (i = 0; i < MAXPLAYERS; ++i) if (playeringame[i]) ++count;
+    for (i = 0; i < MAXPLAYERS; ++i)
+      if (playeringame[i])
+        ++count;
 
     fwrite(&count, sizeof(int), 1, dsda_ghost_export);
 
@@ -187,11 +195,13 @@ void dsda_ExportGhostFrame(void) {
   }
 
   for (i = 0; i < MAXPLAYERS; ++i) {
-    if (!playeringame[i]) break;
+    if (!playeringame[i])
+      break;
 
     player = players[i].mo;
 
-    if (player == NULL) continue;
+    if (player == NULL)
+      continue;
 
     ghost_frame.x = player->x;
     ghost_frame.y = player->y;
@@ -209,8 +219,8 @@ void dsda_ExportGhostFrame(void) {
 
 // Stripped down version of P_SpawnMobj
 void dsda_SpawnGhost(void) {
-  mobj_t* mobj;
-  state_t* ghost_state;
+  mobj_t *mobj;
+  state_t *ghost_state;
   int ghost_i;
   dboolean any_ghosts;
 
@@ -228,17 +238,17 @@ void dsda_SpawnGhost(void) {
 
     if (dsda_CycleGhostColors()) {
       switch (ghost_i % 4) {
-        case 0:
-          break;
-        case 1:
-          mobj->flags |= MF_TRANSLATION1;
-          break;
-        case 2:
-          mobj->flags |= MF_TRANSLATION2;
-          break;
-        case 3:
-          mobj->flags |= MF_TRANSLATION;
-          break;
+      case 0:
+        break;
+      case 1:
+        mobj->flags |= MF_TRANSLATION1;
+        break;
+      case 2:
+        mobj->flags |= MF_TRANSLATION2;
+        break;
+      case 3:
+        mobj->flags |= MF_TRANSLATION;
+        break;
       }
     }
 
@@ -249,16 +259,15 @@ void dsda_SpawnGhost(void) {
 
     ghost_state = &states[dsda_ghost_info.spawnstate];
 
-    mobj->state  = ghost_state;
-    mobj->tics   = ghost_state->tics;
+    mobj->state = ghost_state;
+    mobj->tics = ghost_state->tics;
     mobj->sprite = ghost_state->sprite;
-    mobj->frame  = ghost_state->frame;
+    mobj->frame = ghost_state->frame;
     mobj->touching_sectorlist = NULL;
 
     P_SetThingPosition(mobj);
 
-    mobj->dropoffz =
-    mobj->floorz   = mobj->subsector->sector->floorheight;
+    mobj->dropoffz = mobj->floorz = mobj->subsector->sector->floorheight;
     mobj->ceilingz = mobj->subsector->sector->ceilingheight;
 
     mobj->PrevX = mobj->x;
@@ -279,9 +288,9 @@ void dsda_SpawnGhost(void) {
   }
 }
 
-void dsda_UpdateGhosts(void* _void) {
-  dsda_ghost_t* ghost;
-  mobj_t* mobj;
+void dsda_UpdateGhosts(void *_void) {
+  dsda_ghost_t *ghost;
+  mobj_t *mobj;
   int ghost_i;
   int read_result;
   dboolean ghost_was_behind;
@@ -289,12 +298,14 @@ void dsda_UpdateGhosts(void* _void) {
   for (ghost_i = 0; ghost_i < dsda_ghost_import.count; ++ghost_i) {
     ghost = &dsda_ghost_import.ghosts[ghost_i];
 
-    if (ghost->fstream == NULL) continue;
+    if (ghost->fstream == NULL)
+      continue;
 
     mobj = ghost->mobj;
 
     // Ghost removed from map (finished map already)
-    if (mobj->touching_sectorlist == NULL) continue;
+    if (mobj->touching_sectorlist == NULL)
+      continue;
 
     mobj->PrevX = mobj->x;
     mobj->PrevY = mobj->y;
@@ -304,7 +315,8 @@ void dsda_UpdateGhosts(void* _void) {
 
     // if the ghost was left behind, catch it up
     do {
-      read_result = fread(&ghost->frame, sizeof(dsda_ghost_frame_t), 1, ghost->fstream);
+      read_result =
+          fread(&ghost->frame, sizeof(dsda_ghost_frame_t), 1, ghost->fstream);
 
       if (read_result != 1) {
         fclose(ghost->fstream);
@@ -313,7 +325,8 @@ void dsda_UpdateGhosts(void* _void) {
       }
     } while (ghost_was_behind && ghost->frame.map != gamemap);
 
-    if (ghost->fstream == NULL) continue;
+    if (ghost->fstream == NULL)
+      continue;
 
     P_UnsetThingPosition(mobj);
 

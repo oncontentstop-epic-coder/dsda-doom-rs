@@ -15,30 +15,22 @@
 //	DSDA Palette Management
 //
 
-#include "w_wad.h"
 #include "v_video.h"
+#include "w_wad.h"
 
 #include "palette.h"
 
 static int playpal_index = playpal_default;
 
 static dsda_playpal_t playpal_data[NUMPALETTES] = {
-  { playpal_default, "PLAYPAL" },
-  { playpal_1, "PLAYPAL1" },
-  { playpal_2, "PLAYPAL2" },
-  { playpal_3, "PLAYPAL3" },
-  { playpal_4, "PLAYPAL4" },
-  { playpal_5, "PLAYPAL5" },
-  { playpal_6, "PLAYPAL6" },
-  { playpal_7, "PLAYPAL7" },
-  { playpal_8, "PLAYPAL8" },
-  { playpal_9, "PLAYPAL9" },
-  { playpal_heretic_e2end, "E2PAL" }
-};
+    {playpal_default, "PLAYPAL"},    {playpal_1, "PLAYPAL1"},
+    {playpal_2, "PLAYPAL2"},         {playpal_3, "PLAYPAL3"},
+    {playpal_4, "PLAYPAL4"},         {playpal_5, "PLAYPAL5"},
+    {playpal_6, "PLAYPAL6"},         {playpal_7, "PLAYPAL7"},
+    {playpal_8, "PLAYPAL8"},         {playpal_9, "PLAYPAL9"},
+    {playpal_heretic_e2end, "E2PAL"}};
 
-dsda_playpal_t* dsda_PlayPalData(void) {
-  return &playpal_data[playpal_index];
-}
+dsda_playpal_t *dsda_PlayPalData(void) { return &playpal_data[playpal_index]; }
 
 void dsda_CyclePlayPal(void) {
   int lump_num = -1;
@@ -130,11 +122,9 @@ void dsda_InitPlayPal(void) {
 
       for (i = 0; i < 256; i++) {
         for (j = i + 1; j < 256; j++) {
-          if (
-            playpal[3 * i + 0] == playpal[3 * j + 0] &&
-            playpal[3 * i + 1] == playpal[3 * j + 1] &&
-            playpal[3 * i + 2] == playpal[3 * j + 2]
-          ) {
+          if (playpal[3 * i + 0] == playpal[3 * j + 0] &&
+              playpal[3 * i + 1] == playpal[3 * j + 1] &&
+              playpal[3 * i + 2] == playpal[3 * j + 2]) {
             found = 1;
             break;
           }
@@ -146,11 +136,10 @@ void dsda_InitPlayPal(void) {
 
       if (found) { // found duplicate
         playpal_data[playpal_i].transparent = i;
-        playpal_data[playpal_i].duplicate   = j;
-      }
-      else { // no duplicate: use 255 for transparency, as done previously
+        playpal_data[playpal_i].duplicate = j;
+      } else { // no duplicate: use 255 for transparency, as done previously
         playpal_data[playpal_i].transparent = 255;
-        playpal_data[playpal_i].duplicate   = -1;
+        playpal_data[playpal_i].duplicate = -1;
       }
 
       W_UnlockLumpNum(lump);

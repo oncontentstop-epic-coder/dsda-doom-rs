@@ -31,10 +31,8 @@
  *
  *-----------------------------------------------------------------------------*/
 
-
 #ifndef __D_PLAYER__
 #define __D_PLAYER__
-
 
 // The player data structure depends on a number
 // of other structs: items (internal inventory),
@@ -56,12 +54,10 @@
 #pragma interface
 #endif
 
-
 //
 // Player states.
 //
-typedef enum
-{
+typedef enum {
   // Playing or camping.
   PST_LIVE,
   // Dead on the ground, view follows killer.
@@ -71,135 +67,130 @@ typedef enum
 
 } playerstate_t;
 
-
 //
 // Player internal flags, for cheats and debug.
 //
-typedef enum
-{
+typedef enum {
   // No clipping, walk through barriers.
-  CF_NOCLIP           = 1,
+  CF_NOCLIP = 1,
   // No damage, no health loss.
-  CF_GODMODE          = 2,
+  CF_GODMODE = 2,
   // Not really a cheat, just a debug aid.
-  CF_NOMOMENTUM       = 4,
+  CF_NOMOMENTUM = 4,
 
   // [RH] Monsters don't target
-  CF_NOTARGET         = 8,
+  CF_NOTARGET = 8,
   // [RH] Flying player
-  CF_FLY              = 16,
+  CF_FLY = 16,
 } cheat_t;
 
 // heretic
-#define NUMINVENTORYSLOTS	14
-typedef struct
-{
-    int type;
-    int count;
+#define NUMINVENTORYSLOTS 14
+typedef struct {
+  int type;
+  int count;
 } inventory_t;
 
 // heretic
-typedef enum
-{
-    arti_none,
-    arti_invulnerability,
-    arti_invisibility,
-    arti_health,
-    arti_superhealth,
-    arti_tomeofpower,
-    arti_torch,
-    arti_firebomb,
-    arti_egg,
-    arti_fly,
-    arti_teleport,
-    NUMARTIFACTS
+typedef enum {
+  arti_none,
+  arti_invulnerability,
+  arti_invisibility,
+  arti_health,
+  arti_superhealth,
+  arti_tomeofpower,
+  arti_torch,
+  arti_firebomb,
+  arti_egg,
+  arti_fly,
+  arti_teleport,
+  NUMARTIFACTS
 } artitype_t;
 
 //
 // Extended player object info: player_t
 //
-typedef struct player_s
-{
-  mobj_t*             mo;
-  playerstate_t       playerstate;
-  ticcmd_t            cmd;
+typedef struct player_s {
+  mobj_t *mo;
+  playerstate_t playerstate;
+  ticcmd_t cmd;
 
   // Determine POV,
   //  including viewpoint bobbing during movement.
   // Focal origin above r.z
-  fixed_t             viewz;
+  fixed_t viewz;
   // Base height above floor for viewz.
-  fixed_t             viewheight;
+  fixed_t viewheight;
   // Bob/squat speed.
-  fixed_t             deltaviewheight;
+  fixed_t deltaviewheight;
   // bounded/scaled total momentum.
-  fixed_t             bob;
+  fixed_t bob;
 
   // This is only used between levels,
   // mo->health is used during levels.
-  int                 health;
-  int                 armorpoints;
+  int health;
+  int armorpoints;
   // Armor type is 0-2.
-  int                 armortype;
+  int armortype;
 
   // Power ups. invinc and invis are tic counters.
-  int                 powers[NUMPOWERS];
-  dboolean           cards[NUMCARDS];
-  dboolean           backpack;
+  int powers[NUMPOWERS];
+  dboolean cards[NUMCARDS];
+  dboolean backpack;
 
   // Frags, kills of other players.
-  int                 frags[MAXPLAYERS];
-  weapontype_t        readyweapon;
+  int frags[MAXPLAYERS];
+  weapontype_t readyweapon;
 
   // Is wp_nochange if not changing.
-  weapontype_t        pendingweapon;
+  weapontype_t pendingweapon;
 
-  dboolean           weaponowned[NUMWEAPONS];
-  int                 ammo[NUMAMMO];
-  int                 maxammo[NUMAMMO];
+  dboolean weaponowned[NUMWEAPONS];
+  int ammo[NUMAMMO];
+  int maxammo[NUMAMMO];
 
   // True if button down last tic.
-  int                 attackdown;
-  int                 usedown;
+  int attackdown;
+  int usedown;
 
   // Bit flags, for cheats and debug.
   // See cheat_t, above.
-  int                 cheats;
+  int cheats;
 
   // Refired shots are less accurate.
-  int                 refire;
+  int refire;
 
-   // For intermission stats.
-  int                 killcount;
-  int                 itemcount;
-  int                 secretcount;
+  // For intermission stats.
+  int killcount;
+  int itemcount;
+  int secretcount;
 
   // Hint messages. // CPhipps - const
-  const char*         message;
+  const char *message;
 
   // For screen flashing (red or bright).
-  int                 damagecount;
-  int                 bonuscount;
+  int damagecount;
+  int bonuscount;
 
   // Who did damage (NULL for floors/ceilings).
-  mobj_t*             attacker;
+  mobj_t *attacker;
 
   // So gun flashes light up areas.
-  int                 extralight;
+  int extralight;
 
   // Current PLAYPAL, ???
   //  can be set to REDCOLORMAP for pain, etc.
-  int                 fixedcolormap;
+  int fixedcolormap;
 
   // Player skin colorshift,
   //  0-3 for which color to draw player.
-  int                 colormap;
+  int colormap;
 
   // Overlay view sprites (gun, etc).
-  pspdef_t            psprites[NUMPSPRITES];
+  pspdef_t psprites[NUMPSPRITES];
 
   // True if secret level has been done.
-  dboolean           didsecret;
+  dboolean didsecret;
 
   // e6y
   // All non original (new) fields of player_t struct are moved to bottom
@@ -210,15 +201,15 @@ typedef struct player_s
    * This only represents the thrust that the player applies himself.
    * This avoids anomolies with such things as Boom ice and conveyors.
    */
-  fixed_t            momx, momy;      // killough 10/98
+  fixed_t momx, momy; // killough 10/98
 
-  //e6y
-  int                 maxkilldiscount;
+  // e6y
+  int maxkilldiscount;
 
   fixed_t prev_viewz;
   angle_t prev_viewangle;
   angle_t prev_viewpitch;
-  fixed_t jumpTics;      // delay the next jump for a moment
+  fixed_t jumpTics; // delay the next jump for a moment
 
   // heretic
   int flyheight;
@@ -228,64 +219,61 @@ typedef struct player_s
   artitype_t readyArtifact;
   int artifactCount;
   int inventorySlotNum;
-  int flamecount;             // for flame thrower duration
-  int chickenTics;            // player is a chicken if > 0
-  int chickenPeck;            // chicken peck countdown
-  mobj_t *rain1;              // active rain maker 1
-  mobj_t *rain2;              // active rain maker 2
+  int flamecount;  // for flame thrower duration
+  int chickenTics; // player is a chicken if > 0
+  int chickenPeck; // chicken peck countdown
+  mobj_t *rain1;   // active rain maker 1
+  mobj_t *rain2;   // active rain maker 2
 } player_t;
-
 
 //
 // INTERMISSION
 // Structure passed e.g. to WI_Start(wb)
 //
-typedef struct
-{
-  dboolean   in;     // whether the player is in game
+typedef struct {
+  dboolean in; // whether the player is in game
 
   // Player stats, kills, collected items etc.
-  int         skills;
-  int         sitems;
-  int         ssecret;
-  int         stime;
-  int         frags[4];
-  int         score;  // current score on entry, modified on return
+  int skills;
+  int sitems;
+  int ssecret;
+  int stime;
+  int frags[4];
+  int score; // current score on entry, modified on return
 
 } wbplayerstruct_t;
 
-typedef struct
-{
-  int         epsd;   // episode # (0-2)
+typedef struct {
+  int epsd; // episode # (0-2)
   struct MapEntry *lastmapinfo;
 
   // if true, splash the secret level
-  dboolean   didsecret;
+  dboolean didsecret;
 
   // previous and next levels, origin 0
-  int         last;
-  int         next;
-  int         nextep;	// for when MAPINFO progression crosses into another episode.
+  int last;
+  int next;
+  int nextep; // for when MAPINFO progression crosses into another episode.
   struct MapEntry *nextmapinfo;
 
-  int         maxkills;
-  int         maxitems;
-  int         maxsecret;
-  int         maxfrags;
+  int maxkills;
+  int maxitems;
+  int maxsecret;
+  int maxfrags;
 
   // the par time
-  int         partime;
+  int partime;
 
   // index of this player in game
-  int         pnum;
+  int pnum;
 
-  wbplayerstruct_t    plyr[MAXPLAYERS];
+  wbplayerstruct_t plyr[MAXPLAYERS];
 
   // CPhipps - total game time for completed levels so far
-  int         totaltimes;
+  int totaltimes;
 
 } wbstartstruct_t;
 
-angle_t P_PlayerPitch(player_t* player);
+angle_t P_PlayerPitch(player_t *player);
 
 #endif

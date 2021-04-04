@@ -18,16 +18,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "m_argv.h"
-#include "info.h"
 #include "d_items.h"
+#include "d_main.h"
+#include "heretic/def.h"
+#include "hu_stuff.h"
+#include "info.h"
+#include "m_argv.h"
 #include "p_inter.h"
 #include "p_spec.h"
 #include "sounds.h"
-#include "d_main.h"
 #include "v_video.h"
-#include "hu_stuff.h"
-#include "heretic/def.h"
 
 #include "global.h"
 
@@ -37,23 +37,23 @@ const demostate_t (*demostates)[4];
 extern const demostate_t doom_demostates[][4];
 extern const demostate_t heretic_demostates[][4];
 
-state_t* states;
+state_t *states;
 int num_states;
 
-const char** sprnames;
+const char **sprnames;
 int num_sprites;
 
-mobjinfo_t* mobjinfo;
+mobjinfo_t *mobjinfo;
 int num_mobj_types;
 int mobj_types_zero;
 int mobj_types_max;
 
-sfxinfo_t* S_sfx;
+sfxinfo_t *S_sfx;
 int num_sfx;
-musicinfo_t* S_music;
+musicinfo_t *S_music;
 int num_music;
 
-weaponinfo_t* weaponinfo;
+weaponinfo_t *weaponinfo;
 
 int g_mt_player;
 int g_mt_tfog;
@@ -105,8 +105,8 @@ int g_cr_gold;
 int g_cr_red;
 int g_cr_blue;
 
-const char* g_menu_flat;
-patchnum_t* g_menu_font;
+const char *g_menu_flat;
+patchnum_t *g_menu_font;
 int g_menu_font_spacing;
 int g_menu_cr_title;
 int g_menu_cr_set;
@@ -127,29 +127,29 @@ static void dsda_AllocateMobjInfo(int zero, int max, int count) {
   memset(mobjinfo, 0, sizeof(mobjinfo_t) * num_mobj_types);
 }
 
-static void dsda_SetStates(state_t* state_list, int count) {
+static void dsda_SetStates(state_t *state_list, int count) {
   states = state_list;
   num_states = count;
 }
 
-static void dsda_SetSpriteNames(const char** sprite_name_list, int count) {
+static void dsda_SetSpriteNames(const char **sprite_name_list, int count) {
   sprnames = sprite_name_list;
   num_sprites = count;
 }
 
-static void dsda_SetSfx(sfxinfo_t* sfx_list, int count) {
+static void dsda_SetSfx(sfxinfo_t *sfx_list, int count) {
   S_sfx = sfx_list;
   num_sfx = count;
 }
 
-static void dsda_SetMusic(musicinfo_t* music_list, int count) {
+static void dsda_SetMusic(musicinfo_t *music_list, int count) {
   S_music = music_list;
   num_music = count;
 }
 
 static void dsda_InitDoom(void) {
   int i;
-  doom_mobjinfo_t* mobjinfo_p;
+  doom_mobjinfo_t *mobjinfo_p;
 
   dsda_AllocateMobjInfo(0, NUMMOBJTYPES, NUMMOBJTYPES);
   dsda_SetStates(doom_states, NUMSTATES);
@@ -225,40 +225,41 @@ static void dsda_InitDoom(void) {
   for (i = 0; i < NUMMOBJTYPES; ++i) {
     mobjinfo_p = &doom_mobjinfo[i];
 
-    mobjinfo[i].doomednum    = mobjinfo_p->doomednum;
-    mobjinfo[i].spawnstate   = mobjinfo_p->spawnstate;
-    mobjinfo[i].spawnhealth  = mobjinfo_p->spawnhealth;
-    mobjinfo[i].seestate     = mobjinfo_p->seestate;
-    mobjinfo[i].seesound     = mobjinfo_p->seesound;
+    mobjinfo[i].doomednum = mobjinfo_p->doomednum;
+    mobjinfo[i].spawnstate = mobjinfo_p->spawnstate;
+    mobjinfo[i].spawnhealth = mobjinfo_p->spawnhealth;
+    mobjinfo[i].seestate = mobjinfo_p->seestate;
+    mobjinfo[i].seesound = mobjinfo_p->seesound;
     mobjinfo[i].reactiontime = mobjinfo_p->reactiontime;
-    mobjinfo[i].attacksound  = mobjinfo_p->attacksound;
-    mobjinfo[i].painstate    = mobjinfo_p->painstate;
-    mobjinfo[i].painchance   = mobjinfo_p->painchance;
-    mobjinfo[i].painsound    = mobjinfo_p->painsound;
-    mobjinfo[i].meleestate   = mobjinfo_p->meleestate;
+    mobjinfo[i].attacksound = mobjinfo_p->attacksound;
+    mobjinfo[i].painstate = mobjinfo_p->painstate;
+    mobjinfo[i].painchance = mobjinfo_p->painchance;
+    mobjinfo[i].painsound = mobjinfo_p->painsound;
+    mobjinfo[i].meleestate = mobjinfo_p->meleestate;
     mobjinfo[i].missilestate = mobjinfo_p->missilestate;
-    mobjinfo[i].deathstate   = mobjinfo_p->deathstate;
-    mobjinfo[i].xdeathstate  = mobjinfo_p->xdeathstate;
-    mobjinfo[i].deathsound   = mobjinfo_p->deathsound;
-    mobjinfo[i].speed        = mobjinfo_p->speed;
-    mobjinfo[i].radius       = mobjinfo_p->radius;
-    mobjinfo[i].height       = mobjinfo_p->height;
-    mobjinfo[i].mass         = mobjinfo_p->mass;
-    mobjinfo[i].damage       = mobjinfo_p->damage;
-    mobjinfo[i].activesound  = mobjinfo_p->activesound;
-    mobjinfo[i].flags        = mobjinfo_p->flags;
-    mobjinfo[i].raisestate   = mobjinfo_p->raisestate;
-    mobjinfo[i].droppeditem  = mobjinfo_p->droppeditem;
-    mobjinfo[i].crashstate   = 0; // not in doom
-    mobjinfo[i].flags2       = 0; // not in doom
+    mobjinfo[i].deathstate = mobjinfo_p->deathstate;
+    mobjinfo[i].xdeathstate = mobjinfo_p->xdeathstate;
+    mobjinfo[i].deathsound = mobjinfo_p->deathsound;
+    mobjinfo[i].speed = mobjinfo_p->speed;
+    mobjinfo[i].radius = mobjinfo_p->radius;
+    mobjinfo[i].height = mobjinfo_p->height;
+    mobjinfo[i].mass = mobjinfo_p->mass;
+    mobjinfo[i].damage = mobjinfo_p->damage;
+    mobjinfo[i].activesound = mobjinfo_p->activesound;
+    mobjinfo[i].flags = mobjinfo_p->flags;
+    mobjinfo[i].raisestate = mobjinfo_p->raisestate;
+    mobjinfo[i].droppeditem = mobjinfo_p->droppeditem;
+    mobjinfo[i].crashstate = 0; // not in doom
+    mobjinfo[i].flags2 = 0;     // not in doom
   }
 }
 
 static void dsda_InitHeretic(void) {
   int i, j;
-  heretic_mobjinfo_t* mobjinfo_p;
+  heretic_mobjinfo_t *mobjinfo_p;
 
-  dsda_AllocateMobjInfo(HERETIC_MT_ZERO, HERETIC_NUMMOBJTYPES, TOTAL_NUMMOBJTYPES);
+  dsda_AllocateMobjInfo(HERETIC_MT_ZERO, HERETIC_NUMMOBJTYPES,
+                        TOTAL_NUMMOBJTYPES);
   dsda_SetStates(heretic_states, HERETIC_NUMSTATES);
   dsda_SetSpriteNames(heretic_sprnames, HERETIC_NUMSPRITES);
   dsda_SetSfx(heretic_S_sfx, HERETIC_NUMSFX);
@@ -333,36 +334,37 @@ static void dsda_InitHeretic(void) {
     mobjinfo_p = &heretic_mobjinfo[i];
 
     j = i + HERETIC_MT_ZERO;
-    mobjinfo[j].doomednum    = mobjinfo_p->doomednum;
-    mobjinfo[j].spawnstate   = mobjinfo_p->spawnstate;
-    mobjinfo[j].spawnhealth  = mobjinfo_p->spawnhealth;
-    mobjinfo[j].seestate     = mobjinfo_p->seestate;
-    mobjinfo[j].seesound     = mobjinfo_p->seesound;
+    mobjinfo[j].doomednum = mobjinfo_p->doomednum;
+    mobjinfo[j].spawnstate = mobjinfo_p->spawnstate;
+    mobjinfo[j].spawnhealth = mobjinfo_p->spawnhealth;
+    mobjinfo[j].seestate = mobjinfo_p->seestate;
+    mobjinfo[j].seesound = mobjinfo_p->seesound;
     mobjinfo[j].reactiontime = mobjinfo_p->reactiontime;
-    mobjinfo[j].attacksound  = mobjinfo_p->attacksound;
-    mobjinfo[j].painstate    = mobjinfo_p->painstate;
-    mobjinfo[j].painchance   = mobjinfo_p->painchance;
-    mobjinfo[j].painsound    = mobjinfo_p->painsound;
-    mobjinfo[j].meleestate   = mobjinfo_p->meleestate;
+    mobjinfo[j].attacksound = mobjinfo_p->attacksound;
+    mobjinfo[j].painstate = mobjinfo_p->painstate;
+    mobjinfo[j].painchance = mobjinfo_p->painchance;
+    mobjinfo[j].painsound = mobjinfo_p->painsound;
+    mobjinfo[j].meleestate = mobjinfo_p->meleestate;
     mobjinfo[j].missilestate = mobjinfo_p->missilestate;
-    mobjinfo[j].deathstate   = mobjinfo_p->deathstate;
-    mobjinfo[j].xdeathstate  = mobjinfo_p->xdeathstate;
-    mobjinfo[j].deathsound   = mobjinfo_p->deathsound;
-    mobjinfo[j].speed        = mobjinfo_p->speed;
-    mobjinfo[j].radius       = mobjinfo_p->radius;
-    mobjinfo[j].height       = mobjinfo_p->height;
-    mobjinfo[j].mass         = mobjinfo_p->mass;
-    mobjinfo[j].damage       = mobjinfo_p->damage;
-    mobjinfo[j].activesound  = mobjinfo_p->activesound;
-    mobjinfo[j].flags        = mobjinfo_p->flags;
-    mobjinfo[j].raisestate   = 0; // not in heretic
-    mobjinfo[j].droppeditem  = 0; // not in heretic
-    mobjinfo[j].crashstate   = mobjinfo_p->crashstate;
-    mobjinfo[j].flags2       = mobjinfo_p->flags2;
+    mobjinfo[j].deathstate = mobjinfo_p->deathstate;
+    mobjinfo[j].xdeathstate = mobjinfo_p->xdeathstate;
+    mobjinfo[j].deathsound = mobjinfo_p->deathsound;
+    mobjinfo[j].speed = mobjinfo_p->speed;
+    mobjinfo[j].radius = mobjinfo_p->radius;
+    mobjinfo[j].height = mobjinfo_p->height;
+    mobjinfo[j].mass = mobjinfo_p->mass;
+    mobjinfo[j].damage = mobjinfo_p->damage;
+    mobjinfo[j].activesound = mobjinfo_p->activesound;
+    mobjinfo[j].flags = mobjinfo_p->flags;
+    mobjinfo[j].raisestate = 0;  // not in heretic
+    mobjinfo[j].droppeditem = 0; // not in heretic
+    mobjinfo[j].crashstate = mobjinfo_p->crashstate;
+    mobjinfo[j].flags2 = mobjinfo_p->flags2;
   }
 
   // heretic doesn't use "clip" concept
-  for (i = 0; i < NUMAMMO; ++i) clipammo[i] = 1;
+  for (i = 0; i < NUMAMMO; ++i)
+    clipammo[i] = 1;
 
   // so few it's not worth implementing a pointer swap
   maxammo[0] = 100; // gold wand
@@ -373,8 +375,7 @@ static void dsda_InitHeretic(void) {
   maxammo[5] = 150; // mace
 }
 
-static dboolean dsda_AutoDetectHeretic(void)
-{
+static dboolean dsda_AutoDetectHeretic(void) {
   int i, length;
   i = M_CheckParm("-iwad");
   if (i && (++i < myargc)) {

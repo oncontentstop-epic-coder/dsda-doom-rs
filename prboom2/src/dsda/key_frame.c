@@ -18,19 +18,19 @@
 #include <time.h>
 
 #include "doomstat.h"
-#include "s_advsound.h"
-#include "s_sound.h"
-#include "p_saveg.h"
+#include "e6y.h"
+#include "g_game.h"
+#include "i_system.h"
+#include "lprintf.h"
+#include "m_argv.h"
+#include "m_misc.h"
 #include "p_map.h"
+#include "p_saveg.h"
 #include "r_draw.h"
 #include "r_fps.h"
 #include "r_main.h"
-#include "g_game.h"
-#include "m_argv.h"
-#include "m_misc.h"
-#include "i_system.h"
-#include "lprintf.h"
-#include "e6y.h"
+#include "s_advsound.h"
+#include "s_sound.h"
 
 #include "dsda/demo.h"
 #include "dsda/options.h"
@@ -38,23 +38,23 @@
 #include "key_frame.h"
 
 // Hook into the save & demo ecosystem
-extern const byte* demo_p;
-extern byte* savebuffer;
+extern const byte *demo_p;
+extern byte *savebuffer;
 extern size_t savegamesize;
 extern dboolean setsizeneeded;
 extern dboolean BorderNeedRefresh;
 struct MapEntry *G_LookupMapinfo(int gameepisode, int gamemap);
 void RecalculateDrawnSubsectors(void);
 
-static byte* dsda_quick_key_frame_buffer;
+static byte *dsda_quick_key_frame_buffer;
 static int dsda_key_frame_restored;
 
 typedef struct {
-  byte* buffer;
+  byte *buffer;
   int index;
 } dsda_key_frame_t;
 
-static dsda_key_frame_t* dsda_auto_key_frames;
+static dsda_key_frame_t *dsda_auto_key_frames;
 static int dsda_last_auto_key_frame;
 static int dsda_auto_key_frames_size;
 static int restore_key_frame_index = -1;
@@ -62,18 +62,20 @@ static int restore_key_frame_index = -1;
 void dsda_InitKeyFrame(void) {
   dsda_auto_key_frames_size = dsda_AutoKeyFrameDepth();
 
-  if (dsda_auto_key_frames_size == 0) return;
+  if (dsda_auto_key_frames_size == 0)
+    return;
 
-  if (dsda_auto_key_frames != NULL) free(dsda_auto_key_frames);
+  if (dsda_auto_key_frames != NULL)
+    free(dsda_auto_key_frames);
 
   dsda_auto_key_frames =
-    calloc(dsda_auto_key_frames_size, sizeof(dsda_key_frame_t));
+      calloc(dsda_auto_key_frames_size, sizeof(dsda_key_frame_t));
   dsda_last_auto_key_frame = -1;
 }
 
-void dsda_ExportKeyFrame(byte* buffer, int length) {
+void dsda_ExportKeyFrame(byte *buffer, int length) {
   char name[40];
-  FILE* fp = NULL;
+  FILE *fp = NULL;
   int timestamp;
 
   timestamp = totalleveltimes + leveltime;
@@ -90,7 +92,7 @@ void dsda_ExportKeyFrame(byte* buffer, int length) {
 }
 
 // Stripped down version of G_DoSaveGame
-void dsda_StoreKeyFrame(byte** buffer, byte complete) {
+void dsda_StoreKeyFrame(byte **buffer, byte complete) {
   int demo_write_buffer_offset, i, length;
   demo_write_buffer_offset = dsda_DemoBufferOffset();
 
@@ -158,7 +160,8 @@ void dsda_StoreKeyFrame(byte** buffer, byte complete) {
   P_ArchiveMap();
   Z_CheckHeap();
 
-  if (*buffer != NULL) free(*buffer);
+  if (*buffer != NULL)
+    free(*buffer);
 
   length = save_p - savebuffer;
 
@@ -175,7 +178,7 @@ void dsda_StoreKeyFrame(byte** buffer, byte complete) {
 
 // Stripped down version of G_DoLoadGame
 // save_p is coopted to use the save logic
-void dsda_RestoreKeyFrame(byte* buffer, byte complete) {
+void dsda_RestoreKeyFrame(byte *buffer, byte complete) {
   int demo_write_buffer_offset, i;
 
   if (buffer == NULL) {
@@ -196,7 +199,8 @@ void dsda_RestoreKeyFrame(byte* buffer, byte complete) {
   save_p += MIN_MAXPLAYERS - MAXPLAYERS;
 
   idmusnum = *save_p++;
-  if (idmusnum == 255) idmusnum = -1;
+  if (idmusnum == 255)
+    idmusnum = -1;
 
   save_p += (G_ReadOptions(save_p) - save_p);
 
@@ -216,8 +220,7 @@ void dsda_RestoreKeyFrame(byte* buffer, byte complete) {
     dsda_SetDemoBufferOffset(0);
     dsda_WriteToDemo(save_p, demo_write_buffer_offset);
     save_p += demo_write_buffer_offset;
-  }
-  else {
+  } else {
     dsda_SetDemoBufferOffset(demo_write_buffer_offset);
   }
 
@@ -229,7 +232,8 @@ void dsda_RestoreKeyFrame(byte* buffer, byte complete) {
   memcpy(&totalleveltimes, save_p, sizeof(totalleveltimes));
   save_p += sizeof(totalleveltimes);
 
-  restore_key_frame_index = (totalleveltimes + leveltime) / (35 * dsda_AutoKeyFrameInterval());
+  restore_key_frame_index =
+      (totalleveltimes + leveltime) / (35 * dsda_AutoKeyFrameInterval());
 
   basetic = gametic - *save_p++;
 
@@ -248,7 +252,8 @@ void dsda_RestoreKeyFrame(byte* buffer, byte complete) {
 
   RecalculateDrawnSubsectors();
 
-  if (setsizeneeded) R_ExecuteSetViewSize();
+  if (setsizeneeded)
+    R_ExecuteSetViewSize();
 
   R_FillBackScreen();
 
@@ -260,7 +265,8 @@ void dsda_RestoreKeyFrame(byte* buffer, byte complete) {
 }
 
 int dsda_KeyFrameRestored(void) {
-  if (!dsda_key_frame_restored) return 0;
+  if (!dsda_key_frame_restored)
+    return 0;
 
   dsda_key_frame_restored = 0;
   return 1;
@@ -274,20 +280,18 @@ void dsda_RestoreQuickKeyFrame(void) {
   dsda_RestoreKeyFrame(dsda_quick_key_frame_buffer, true);
 }
 
-void dsda_RestoreKeyFrameFile(const char* name) {
+void dsda_RestoreKeyFrameFile(const char *name) {
   char *filename;
-  byte* buffer;
+  byte *buffer;
 
   filename = I_FindFile(name, ".kf");
-  if (filename)
-  {
+  if (filename) {
     M_ReadFile(filename, &buffer);
     free(filename);
 
     dsda_RestoreKeyFrame(buffer, true);
     free(buffer);
-  }
-  else
+  } else
     I_Error("dsda_RestoreKeyFrameFile: cannot find %s", name);
 }
 
@@ -317,27 +321,26 @@ void dsda_RewindAutoKeyFrame(void) {
   key_frame_index = current_time / interval_tics - 1;
 
   history_index = dsda_last_auto_key_frame - 1;
-  if (history_index < 0) history_index = dsda_auto_key_frames_size - 1;
+  if (history_index < 0)
+    history_index = dsda_auto_key_frames_size - 1;
 
   if (dsda_auto_key_frames[history_index].index <= key_frame_index) {
     dsda_last_auto_key_frame = history_index;
     dsda_SkipNextWipe();
     dsda_RestoreKeyFrame(dsda_auto_key_frames[history_index].buffer, false);
-  }
-  else doom_printf("No key frame found"); // rewind past the depth limit
+  } else
+    doom_printf("No key frame found"); // rewind past the depth limit
 }
 
 void dsda_UpdateAutoKeyFrames(void) {
   int key_frame_index;
   int current_time;
   int interval_tics;
-  dsda_key_frame_t* current_key_frame;
+  dsda_key_frame_t *current_key_frame;
 
-  if (
-    dsda_auto_key_frames_size == 0 ||
-    gamestate != GS_LEVEL ||
-    gameaction != ga_nothing
-  ) return;
+  if (dsda_auto_key_frames_size == 0 || gamestate != GS_LEVEL ||
+      gameaction != ga_nothing)
+    return;
 
   current_time = totalleveltimes + leveltime;
   interval_tics = 35 * dsda_AutoKeyFrameInterval();

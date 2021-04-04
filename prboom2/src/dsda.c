@@ -15,24 +15,24 @@
 //	DSDA Tools
 //
 
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
-#include "m_argv.h"
+#include "am_map.h"
 #include "doomstat.h"
+#include "g_game.h"
+#include "m_argv.h"
 #include "p_inter.h"
 #include "p_tick.h"
-#include "g_game.h"
-#include "sounds.h"
 #include "s_sound.h"
-#include "am_map.h"
+#include "sounds.h"
 
-#include "dsda_mobj_extension.h"
+#include "dsda.h"
 #include "dsda/ghost.h"
 #include "dsda/hud.h"
 #include "dsda/key_frame.h"
 #include "dsda/settings.h"
-#include "dsda.h"
+#include "dsda_mobj_extension.h"
 
 #define TELEFRAG_DAMAGE 10000
 #define STROLLER_THRESHOLD 25
@@ -75,15 +75,15 @@ int dsda_track_pacifist;
 int dsda_track_100k;
 
 // other
-char* dsda_demo_name_base;
+char *dsda_demo_name_base;
 int dsda_max_kill_requirement;
 int dsda_session_attempts = 1;
 int dsda_total_attempts = 1;
 
-dboolean dsda_IsWeapon(mobj_t* thing);
-void dsda_DisplayNotification(const char* msg);
+dboolean dsda_IsWeapon(mobj_t *thing);
+void dsda_DisplayNotification(const char *msg);
 void dsda_ResetMapVariables(void);
-const char* dsda_DetectCategory(void);
+const char *dsda_DetectCategory(void);
 
 void dsda_ReadCommandLine(void) {
   int p;
@@ -105,9 +105,11 @@ void dsda_ReadCommandLine(void) {
   if ((p = M_CheckParm("-export_ghost")) && ++p < myargc)
     dsda_InitGhostExport(myargv[p]);
 
-  if ((p = M_CheckParm("-import_ghost"))) dsda_InitGhostImport(p);
+  if ((p = M_CheckParm("-import_ghost")))
+    dsda_InitGhostImport(p);
 
-  if (M_CheckParm("-tas")) dsda_SetTas();
+  if (M_CheckParm("-tas"))
+    dsda_SetTas();
 
   dsda_InitKeyFrame();
 }
@@ -132,7 +134,7 @@ void dsda_DisplayNotifications(void) {
   }
 }
 
-void dsda_DisplayNotification(const char* msg) {
+void dsda_DisplayNotification(const char *msg) {
   S_StartSound(0, sfx_radio);
   doom_printf(msg);
 }
@@ -140,28 +142,28 @@ void dsda_DisplayNotification(const char* msg) {
 void dsda_WatchCard(card_t card) {
   if (dsda_time_keys)
     switch (card) {
-      case it_bluecard:
-      case it_blueskull:
-        dsda_AddSplit(DSDA_SPLIT_BLUE_KEY);
-        break;
-      case it_yellowcard:
-      case it_yellowskull:
-        dsda_AddSplit(DSDA_SPLIT_YELLOW_KEY);
-        break;
-      case it_redcard:
-      case it_redskull:
-        dsda_AddSplit(DSDA_SPLIT_RED_KEY);
-        break;
-      default:
-        break;
+    case it_bluecard:
+    case it_blueskull:
+      dsda_AddSplit(DSDA_SPLIT_BLUE_KEY);
+      break;
+    case it_yellowcard:
+    case it_yellowskull:
+      dsda_AddSplit(DSDA_SPLIT_YELLOW_KEY);
+      break;
+    case it_redcard:
+    case it_redskull:
+      dsda_AddSplit(DSDA_SPLIT_RED_KEY);
+      break;
+    default:
+      break;
     }
 }
 
-void dsda_WatchDamage(mobj_t* target, mobj_t* inflictor, mobj_t* source, int damage) {
-  if (
-    ((source && source->player) || (inflictor && inflictor->dsda_extension.player_damaged_barrel)) \
-    && damage != TELEFRAG_DAMAGE
-  ) {
+void dsda_WatchDamage(mobj_t *target, mobj_t *inflictor, mobj_t *source,
+                      int damage) {
+  if (((source && source->player) ||
+       (inflictor && inflictor->dsda_extension.player_damaged_barrel)) &&
+      damage != TELEFRAG_DAMAGE) {
     if (target->type == MT_BARREL)
       target->dsda_extension.player_damaged_barrel = true;
     else if (!target->player)
@@ -174,35 +176,36 @@ void dsda_WatchDamage(mobj_t* target, mobj_t* inflictor, mobj_t* source, int dam
     // "almost reality" means allowing nukage damage
     // we cannot differentiate between crushers and nukage in this scope
     // we account for crushers in dsda_WatchCrush instead
-    if (inflictor) dsda_almost_reality = false;
+    if (inflictor)
+      dsda_almost_reality = false;
   }
 }
 
-void dsda_WatchDeath(mobj_t* thing) {
+void dsda_WatchDeath(mobj_t *thing) {
   if (thing->flags & MF_COUNTKILL) {
     ++dsda_kills_on_map;
 
-    if (dsda_kills_on_map >= totalkills) dsda_100k_on_map = true;
+    if (dsda_kills_on_map >= totalkills)
+      dsda_100k_on_map = true;
   }
 }
 
-void dsda_WatchKill(player_t* player, mobj_t* target) {
+void dsda_WatchKill(player_t *player, mobj_t *target) {
   player->killcount++;
-  if (target->dsda_extension.spawned_by_icon) player->maxkilldiscount++;
+  if (target->dsda_extension.spawned_by_icon)
+    player->maxkilldiscount++;
 }
 
-void dsda_WatchResurrection(mobj_t* target) {
+void dsda_WatchResurrection(mobj_t *target) {
   int i;
 
-  if (
-    (
-      (target->flags ^ MF_COUNTKILL) &
-      (MF_FRIEND | MF_COUNTKILL)
-    ) || target->dsda_extension.spawned_by_icon
-  ) return;
+  if (((target->flags ^ MF_COUNTKILL) & (MF_FRIEND | MF_COUNTKILL)) ||
+      target->dsda_extension.spawned_by_icon)
+    return;
 
   for (i = 0; i < MAXPLAYERS; ++i) {
-    if (!playeringame[i] || players[i].killcount == 0) continue;
+    if (!playeringame[i] || players[i].killcount == 0)
+      continue;
 
     if (players[i].killcount > 0) {
       players[i].maxkilldiscount++;
@@ -211,35 +214,34 @@ void dsda_WatchResurrection(mobj_t* target) {
   }
 }
 
-void dsda_WatchCrush(mobj_t* thing, int damage) {
+void dsda_WatchCrush(mobj_t *thing, int damage) {
   player_t *player;
 
   player = thing->player;
-  if (!player) return;
+  if (!player)
+    return;
 
   // invincible
-  if (
-    (damage < 1000 || (!comp[comp_god] && (player->cheats&CF_GODMODE))) \
-    && (player->cheats&CF_GODMODE || player->powers[pw_invulnerability])
-  ) return;
+  if ((damage < 1000 || (!comp[comp_god] && (player->cheats & CF_GODMODE))) &&
+      (player->cheats & CF_GODMODE || player->powers[pw_invulnerability]))
+    return;
 
   dsda_almost_reality = false;
 }
 
-void dsda_WatchSpawn(mobj_t* spawned) {
-  if (
-    (spawned->flags & MF_COUNTKILL) \
-    || spawned->type == MT_SKULL \
-    || spawned->type == MT_BOSSBRAIN
-  ) dsda_any_monsters = true;
+void dsda_WatchSpawn(mobj_t *spawned) {
+  if ((spawned->flags & MF_COUNTKILL) || spawned->type == MT_SKULL ||
+      spawned->type == MT_BOSSBRAIN)
+    dsda_any_monsters = true;
 
-  if (!dsda_any_weapons) dsda_any_weapons = dsda_IsWeapon(spawned);
+  if (!dsda_any_weapons)
+    dsda_any_weapons = dsda_IsWeapon(spawned);
 
   if (!((spawned->flags ^ MF_COUNTKILL) & (MF_FRIEND | MF_COUNTKILL)))
     ++dsda_max_kill_requirement;
 }
 
-void dsda_WatchIconSpawn(mobj_t* spawned) {
+void dsda_WatchIconSpawn(mobj_t *spawned) {
   spawned->dsda_extension.spawned_by_icon = true;
 
   // Fix count from dsda_WatchSpawn
@@ -249,16 +251,15 @@ void dsda_WatchIconSpawn(mobj_t* spawned) {
     --dsda_max_kill_requirement;
 }
 
-int dsda_MaxKillRequirement() {
-  return dsda_max_kill_requirement;
-}
+int dsda_MaxKillRequirement() { return dsda_max_kill_requirement; }
 
 void dsda_WatchCommand(void) {
   int i;
-  ticcmd_t* cmd;
+  ticcmd_t *cmd;
 
   for (i = 0; i < MAXPLAYERS; ++i) {
-    if (!playeringame[i]) continue;
+    if (!playeringame[i])
+      continue;
 
     cmd = &players[i].cmd;
 
@@ -268,7 +269,8 @@ void dsda_WatchCommand(void) {
     if (cmd->sidemove != 0 || abs(cmd->forwardmove) > STROLLER_THRESHOLD)
       dsda_stroller = false;
 
-    if (abs(cmd->sidemove) > TURBO_THRESHOLD || abs(cmd->forwardmove) > TURBO_THRESHOLD)
+    if (abs(cmd->sidemove) > TURBO_THRESHOLD ||
+        abs(cmd->forwardmove) > TURBO_THRESHOLD)
       dsda_turbo = true;
   }
 
@@ -282,9 +284,7 @@ void dsda_WatchBeforeLevelSetup(void) {
   dsda_max_kill_requirement = 0;
 }
 
-void dsda_WatchAfterLevelSetup(void) {
-  dsda_SpawnGhost();
-}
+void dsda_WatchAfterLevelSetup(void) { dsda_SpawnGhost(); }
 
 void dsda_WatchLevelCompletion(void) {
   thinker_t *th;
@@ -294,16 +294,14 @@ void dsda_WatchLevelCompletion(void) {
   int kill_count = 0;
 
   for (th = thinkercap.next; th != &thinkercap; th = th->next) {
-    if (th->function != P_MobjThinker) continue;
+    if (th->function != P_MobjThinker)
+      continue;
 
     mobj = (mobj_t *)th;
 
     // max rules: everything dead that affects kill counter except icon spawns
-    if (
-      !((mobj->flags ^ MF_COUNTKILL) & (MF_FRIEND | MF_COUNTKILL)) \
-      && !mobj->dsda_extension.spawned_by_icon \
-      && mobj->health > 0
-    ) {
+    if (!((mobj->flags ^ MF_COUNTKILL) & (MF_FRIEND | MF_COUNTKILL)) &&
+        !mobj->dsda_extension.spawned_by_icon && mobj->health > 0) {
       ++dsda_missed_monsters;
     }
 
@@ -314,7 +312,8 @@ void dsda_WatchLevelCompletion(void) {
   }
 
   for (i = 0; i < MAXPLAYERS; ++i) {
-    if (!playeringame[i]) continue;
+    if (!playeringame[i])
+      continue;
 
     kill_count += players[i].killcount;
     secret_count += players[i].secretcount;
@@ -322,42 +321,48 @@ void dsda_WatchLevelCompletion(void) {
 
   dsda_missed_secrets += (totalsecret - secret_count);
 
-  if (kill_count < totalkills) dsda_100k = false;
-  if (secret_count < totalsecret) dsda_100s = false;
-  if (totalkills > 0) dsda_any_counted_monsters = true;
-  if (totalsecret > 0) dsda_any_secrets = true;
+  if (kill_count < totalkills)
+    dsda_100k = false;
+  if (secret_count < totalsecret)
+    dsda_100s = false;
+  if (totalkills > 0)
+    dsda_any_counted_monsters = true;
+  if (totalsecret > 0)
+    dsda_any_secrets = true;
 }
 
-dboolean dsda_IsWeapon(mobj_t* thing) {
+dboolean dsda_IsWeapon(mobj_t *thing) {
   switch (thing->sprite) {
-    case SPR_BFUG:
-    case SPR_MGUN:
-    case SPR_CSAW:
-    case SPR_LAUN:
-    case SPR_PLAS:
-    case SPR_SHOT:
-    case SPR_SGN2:
-      return true;
-    default:
-      return false;
+  case SPR_BFUG:
+  case SPR_MGUN:
+  case SPR_CSAW:
+  case SPR_LAUN:
+  case SPR_PLAS:
+  case SPR_SHOT:
+  case SPR_SGN2:
+    return true;
+  default:
+    return false;
   }
 }
 
 void dsda_WatchWeaponFire(weapontype_t weapon) {
-  if (weapon == wp_fist || weapon == wp_pistol || weapon == wp_chainsaw) return;
+  if (weapon == wp_fist || weapon == wp_pistol || weapon == wp_chainsaw)
+    return;
 
   dsda_tyson_weapons = false;
 }
 
 void dsda_WatchSecret(void) {
-  if (dsda_time_secrets) dsda_AddSplit(DSDA_SPLIT_SECRET);
+  if (dsda_time_secrets)
+    dsda_AddSplit(DSDA_SPLIT_SECRET);
 }
 
 // from crispy - incrementing demo file names
-char* dsda_NewDemoName(void) {
-  char* demo_name;
+char *dsda_NewDemoName(void) {
+  char *demo_name;
   size_t demo_name_size;
-  FILE* fp = NULL;
+  FILE *fp = NULL;
   static unsigned int j = 2;
 
   demo_name_size = strlen(dsda_demo_name_base) + 11; // 11 = -12345.lmp\0
@@ -366,7 +371,7 @@ char* dsda_NewDemoName(void) {
 
   for (; j <= 99999 && (fp = fopen(demo_name, "rb")) != NULL; j++) {
     snprintf(demo_name, demo_name_size, "%s-%05d.lmp", dsda_demo_name_base, j);
-    fclose (fp);
+    fclose(fp);
   }
 
   dsda_total_attempts = j - 1;
@@ -396,9 +401,10 @@ static void dsda_ResetTracking(void) {
 }
 
 void dsda_WatchDeferredInitNew(skill_t skill, int episode, int map) {
-  char* demo_name;
+  char *demo_name;
 
-  if (!demorecording) return;
+  if (!demorecording)
+    return;
 
   ++dsda_session_attempts;
 
@@ -417,21 +423,24 @@ void dsda_WatchDeferredInitNew(skill_t skill, int episode, int map) {
 }
 
 void dsda_WatchNewGame(void) {
-  if (!demorecording) return;
+  if (!demorecording)
+    return;
 
   G_BeginRecording();
 }
 
-void dsda_WatchLevelReload(int* reloaded) {
-  if (!demorecording || *reloaded) return;
+void dsda_WatchLevelReload(int *reloaded) {
+  if (!demorecording || *reloaded)
+    return;
 
   G_DeferedInitNew(gameskill, gameepisode, startmap);
   *reloaded = 1;
 }
 
-void dsda_WatchRecordDemo(const char* name) {
+void dsda_WatchRecordDemo(const char *name) {
   size_t base_size;
-  if (dsda_demo_name_base != NULL) return;
+  if (dsda_demo_name_base != NULL)
+    return;
 
   base_size = strlen(name) - 3;
   dsda_demo_name_base = malloc(base_size);
@@ -447,7 +456,8 @@ void dsda_WatchRecordDemo(const char* name) {
 void dsda_WriteAnalysis(void) {
   FILE *fstream = NULL;
 
-  if (!dsda_analysis) return;
+  if (!dsda_analysis)
+    return;
 
   fstream = fopen("analysis.txt", "w");
 
@@ -456,9 +466,12 @@ void dsda_WriteAnalysis(void) {
     return;
   }
 
-  if (dsda_reality) dsda_almost_reality = false;
-  if (!dsda_pacifist) dsda_stroller = false;
-  if (!dsda_any_weapons) dsda_weapon_collector = false;
+  if (dsda_reality)
+    dsda_almost_reality = false;
+  if (!dsda_pacifist)
+    dsda_stroller = false;
+  if (!dsda_any_weapons)
+    dsda_weapon_collector = false;
 
   dsda_nomo = nomonsters > 0;
   dsda_respawn = respawnparm > 0;
@@ -486,63 +499,63 @@ void dsda_WriteAnalysis(void) {
   return;
 }
 
-const char* dsda_DetectCategory(void) {
+const char *dsda_DetectCategory(void) {
   dboolean satisfies_max;
   dboolean satisfies_respawn;
   dboolean satisfies_tyson;
   dboolean satisfies_100s;
 
-  satisfies_max = (
-    dsda_missed_monsters == 0 \
-    && dsda_100s \
-    && (dsda_any_secrets || dsda_any_counted_monsters)
-  );
-  satisfies_respawn = (
-    dsda_100s \
-    && dsda_100k \
-    && dsda_any_monsters \
-    && (dsda_any_secrets || dsda_any_counted_monsters)
-  );
-  satisfies_tyson = (
-    dsda_missed_monsters == 0 \
-    && dsda_tyson_weapons  \
-    && dsda_any_counted_monsters
-  );
+  satisfies_max = (dsda_missed_monsters == 0 && dsda_100s &&
+                   (dsda_any_secrets || dsda_any_counted_monsters));
+  satisfies_respawn = (dsda_100s && dsda_100k && dsda_any_monsters &&
+                       (dsda_any_secrets || dsda_any_counted_monsters));
+  satisfies_tyson = (dsda_missed_monsters == 0 && dsda_tyson_weapons &&
+                     dsda_any_counted_monsters);
   satisfies_100s = dsda_any_secrets && dsda_100s;
 
-  if (dsda_turbo) return "Other";
+  if (dsda_turbo)
+    return "Other";
 
   if (gameskill == sk_hard) {
     if (dsda_nomo && !dsda_respawn && !dsda_fast) {
-      if (satisfies_100s) return "NoMo 100S";
+      if (satisfies_100s)
+        return "NoMo 100S";
 
       return "NoMo";
     }
 
     if (dsda_respawn && !dsda_nomo && !dsda_fast) {
-      if (satisfies_respawn) return "UV Respawn";
+      if (satisfies_respawn)
+        return "UV Respawn";
 
       return "Other";
     }
 
     if (dsda_fast && !dsda_nomo && !dsda_respawn) {
-      if (satisfies_max) return "UV Fast";
+      if (satisfies_max)
+        return "UV Fast";
 
       return "Other";
     }
 
-    if (dsda_nomo || dsda_respawn || dsda_fast) return "Other";
+    if (dsda_nomo || dsda_respawn || dsda_fast)
+      return "Other";
 
-    if (satisfies_max) return "UV Max";
-    if (satisfies_tyson) return "UV Tyson";
-    if (dsda_any_monsters && dsda_stroller) return "Stroller";
-    if (dsda_any_monsters && dsda_pacifist) return "Pacifist";
+    if (satisfies_max)
+      return "UV Max";
+    if (satisfies_tyson)
+      return "UV Tyson";
+    if (dsda_any_monsters && dsda_stroller)
+      return "Stroller";
+    if (dsda_any_monsters && dsda_pacifist)
+      return "Pacifist";
 
     return "UV Speed";
-  }
-  else if (gameskill == sk_nightmare) {
-    if (nomonsters) return "Other";
-    if (satisfies_100s) return "NM 100S";
+  } else if (gameskill == sk_nightmare) {
+    if (nomonsters)
+      return "Other";
+    if (satisfies_100s)
+      return "NM 100S";
 
     return "NM Speed";
   }

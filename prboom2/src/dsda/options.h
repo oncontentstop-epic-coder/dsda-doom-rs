@@ -64,9 +64,9 @@ typedef struct dsda_options {
   // int comp_32;
 } dsda_options_t;
 
-const dsda_options_t* dsda_Options(void);
+const dsda_options_t *dsda_Options(void);
 int dsda_GameOptionSize(void);
-byte* dsda_WriteOptions21(byte* demo_p);
+byte *dsda_WriteOptions21(byte *demo_p);
 const byte *dsda_ReadOptions21(const byte *demo_p);
 
 #endif

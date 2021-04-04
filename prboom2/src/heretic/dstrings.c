@@ -15,6 +15,4 @@
 //
 
 // HERETIC_TODO: DEH_String
-const char *DEH_String(const char *s) {
-  return s;
-}
+const char *DEH_String(const char *s) { return s; }

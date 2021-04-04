@@ -15,22 +15,21 @@
 //	DSDA MSecNode Management
 //
 
-#include "r_defs.h"
-#include "p_saveg.h"
 #include "lprintf.h"
+#include "p_saveg.h"
 #include "p_tick.h"
+#include "r_defs.h"
 
 #include "msecnode.h"
 
 extern sector_t *sectors;
 extern int numsectors;
 
-msecnode_t* P_GetSecnode(void);
-msecnode_t* P_DelSecnode(msecnode_t* node);
-int P_GetMobj(mobj_t* mi, size_t s);
+msecnode_t *P_GetSecnode(void);
+msecnode_t *P_DelSecnode(msecnode_t *node);
+int P_GetMobj(mobj_t *mi, size_t s);
 
-static dboolean dsda_IsMSecNodeMobj(thinker_t* thinker)
-{
+static dboolean dsda_IsMSecNodeMobj(thinker_t *thinker) {
   return thinker->function == P_MobjThinker ||
          thinker->function == P_BlasterMobjThinker;
 }
@@ -85,8 +84,8 @@ static dboolean dsda_IsMSecNodeMobj(thinker_t* thinker)
 
 void dsda_ArchiveMSecNodes(void) {
   int sector_i;
-  thinker_t* th;
-  msecnode_t* msecnode;
+  thinker_t *th;
+  msecnode_t *msecnode;
   int count;
 
   // Store the m_things using the mobj_p indices (see p_saveg.c)
@@ -118,12 +117,13 @@ void dsda_ArchiveMSecNodes(void) {
 
   // Store the m_sectors using the sector indices
   for (th = thinkercap.next; th != &thinkercap; th = th->next) {
-    if (!dsda_IsMSecNodeMobj(th)) continue;
+    if (!dsda_IsMSecNodeMobj(th))
+      continue;
 
     // We must store the count because it will be unobtainable
     //   while we are rewriting the m_tnext chains
     count = 0;
-    msecnode = ((mobj_t*) th)->touching_sectorlist;
+    msecnode = ((mobj_t *)th)->touching_sectorlist;
     while (msecnode) {
       count++;
       msecnode = msecnode->m_tnext;
@@ -133,7 +133,7 @@ void dsda_ArchiveMSecNodes(void) {
     memcpy(save_p, &count, sizeof(count));
     save_p += sizeof(count);
 
-    msecnode = ((mobj_t*) th)->touching_sectorlist;
+    msecnode = ((mobj_t *)th)->touching_sectorlist;
     while (msecnode) {
       sector_i = msecnode->m_sector - sectors;
 
@@ -146,8 +146,9 @@ void dsda_ArchiveMSecNodes(void) {
   }
 }
 
-static void dsda_UnArchiveMSecNodeMobj(msecnode_t* msecnode, mobj_t** mobj_p, int mobj_count) {
-  mobj_t* mobj;
+static void dsda_UnArchiveMSecNodeMobj(msecnode_t *msecnode, mobj_t **mobj_p,
+                                       int mobj_count) {
+  mobj_t *mobj;
 
   memcpy(&mobj, save_p, sizeof(mobj));
   save_p += sizeof(mobj);
@@ -160,13 +161,13 @@ static void dsda_UnArchiveMSecNodeMobj(msecnode_t* msecnode, mobj_t** mobj_p, in
     I_Error("dsda_UnArchiveMSecNodeMobj: mobj does not exist!\n");
 }
 
-void dsda_UnArchiveMSecNodes(mobj_t** mobj_p, int mobj_count) {
+void dsda_UnArchiveMSecNodes(mobj_t **mobj_p, int mobj_count) {
   int i, sector_i;
-  thinker_t* th;
-  mobj_t* mobj;
-  msecnode_t* msecnode;
-  msecnode_t* msecnode_prev;
-  msecnode_t** msecnode_next;
+  thinker_t *th;
+  mobj_t *mobj;
+  msecnode_t *msecnode;
+  msecnode_t *msecnode_prev;
+  msecnode_t **msecnode_next;
   dboolean found;
   int count, existing_count;
 
@@ -232,9 +233,10 @@ void dsda_UnArchiveMSecNodes(mobj_t** mobj_p, int mobj_count) {
   // The msecnode (sector, thing) pairs are set,
   //   but the m_tnext chains now weave through the wrong msecnodes
   for (th = thinkercap.next; th != &thinkercap; th = th->next) {
-    if (!dsda_IsMSecNodeMobj(th)) continue;
+    if (!dsda_IsMSecNodeMobj(th))
+      continue;
 
-    mobj = ((mobj_t*) th);
+    mobj = ((mobj_t *)th);
 
     // The rewriting going on in this loop reorganizes the m_tnext chains,
     //   so we cannot trust the existing chain length

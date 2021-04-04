@@ -354,12 +354,13 @@ typedef enum {
   sfx_dgdth,
   sfx_dgpain,
 
-  //e6y
+  // e6y
   sfx_secret,
   sfx_gibdth,
   // Everything from here to 500 is reserved
 
-  /* Free sound effect slots for DEHEXTRA. Offset agreed upon with Eternity devs. -SH */
+  /* Free sound effect slots for DEHEXTRA. Offset agreed upon with Eternity
+     devs. -SH */
   sfx_fre000 = 500,
   sfx_fre001,
   sfx_fre002,
@@ -655,10 +656,10 @@ typedef enum {
   heretic_sfx_sbtpai,
   heretic_sfx_plroof,
   heretic_sfx_plrpai,
-  heretic_sfx_plrdth,                 // Normal
-  heretic_sfx_gibdth,                 // Extreme
-  heretic_sfx_plrwdth,                // Wimpy
-  heretic_sfx_plrcdth,                // Crazy
+  heretic_sfx_plrdth,  // Normal
+  heretic_sfx_gibdth,  // Extreme
+  heretic_sfx_plrwdth, // Wimpy
+  heretic_sfx_plrcdth, // Crazy
   heretic_sfx_itemup,
   heretic_sfx_wpnup,
   heretic_sfx_telept,
@@ -720,9 +721,9 @@ extern musicinfo_t heretic_S_music[];
 extern sfxinfo_t doom_S_sfx[];
 extern musicinfo_t doom_S_music[];
 
-extern sfxinfo_t* S_sfx;
+extern sfxinfo_t *S_sfx;
 extern int num_sfx;
-extern musicinfo_t* S_music;
+extern musicinfo_t *S_music;
 extern int num_music;
 
 #endif

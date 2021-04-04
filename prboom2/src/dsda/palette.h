@@ -37,20 +37,20 @@ typedef enum {
 
 typedef struct playpal_data_s {
   const int index;
-  const char* lump_name;
-  unsigned char* lump;
+  const char *lump_name;
+  unsigned char *lump;
   // See r_patch.c
   int transparent;
   int duplicate;
 
   // Array of SDL_Color structs used for setting the 256-colour palette
-  SDL_Color* colours;
+  SDL_Color *colours;
   unsigned short *Palettes15;
   unsigned short *Palettes16;
   unsigned int *Palettes32;
 } dsda_playpal_t;
 
-dsda_playpal_t* dsda_PlayPalData(void);
+dsda_playpal_t *dsda_PlayPalData(void);
 void dsda_CyclePlayPal(void);
 void dsda_SetPlayPal(int index);
 void dsda_FreePlayPal(void);

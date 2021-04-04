@@ -16,10 +16,10 @@
 // F_finale.c
 
 #include "doomstat.h"
-#include "w_wad.h"
-#include "v_video.h"
 #include "s_sound.h"
 #include "sounds.h"
+#include "v_video.h"
+#include "w_wad.h"
 
 #include "dsda/palette.h"
 
@@ -28,11 +28,11 @@
 
 #include "heretic/f_finale.h"
 
-static int finalestage;                // 0 = text, 1 = art screen
+static int finalestage; // 0 = text, 1 = art screen
 static int finalecount;
 
-#define TEXTSPEED       3
-#define TEXTWAIT        250
+#define TEXTSPEED 3
+#define TEXTWAIT 250
 
 static const char *finaletext;
 static const char *finaleflat;
@@ -49,34 +49,32 @@ extern enum automapmode_e automapmode;
 =======================
 */
 
-void Heretic_F_StartFinale(void)
-{
+void Heretic_F_StartFinale(void) {
   gameaction = ga_nothing;
   gamestate = GS_FINALE;
   automapmode &= ~am_active;
 
-  switch (gameepisode)
-  {
-    case 1:
-      finaleflat = DEH_String("FLOOR25");
-      finaletext = DEH_String(HERETIC_E1TEXT);
-      break;
-    case 2:
-      finaleflat = DEH_String("FLATHUH1");
-      finaletext = DEH_String(HERETIC_E2TEXT);
-      break;
-    case 3:
-      finaleflat = DEH_String("FLTWAWA2");
-      finaletext = DEH_String(HERETIC_E3TEXT);
-      break;
-    case 4:
-      finaleflat = DEH_String("FLOOR28");
-      finaletext = DEH_String(HERETIC_E4TEXT);
-      break;
-    case 5:
-      finaleflat = DEH_String("FLOOR08");
-      finaletext = DEH_String(HERETIC_E5TEXT);
-      break;
+  switch (gameepisode) {
+  case 1:
+    finaleflat = DEH_String("FLOOR25");
+    finaletext = DEH_String(HERETIC_E1TEXT);
+    break;
+  case 2:
+    finaleflat = DEH_String("FLATHUH1");
+    finaletext = DEH_String(HERETIC_E2TEXT);
+    break;
+  case 3:
+    finaleflat = DEH_String("FLTWAWA2");
+    finaletext = DEH_String(HERETIC_E3TEXT);
+    break;
+  case 4:
+    finaleflat = DEH_String("FLOOR28");
+    finaletext = DEH_String(HERETIC_E4TEXT);
+    break;
+  case 5:
+    finaleflat = DEH_String("FLOOR08");
+    finaletext = DEH_String(HERETIC_E5TEXT);
+    break;
   }
 
   finalestage = 0;
@@ -85,14 +83,13 @@ void Heretic_F_StartFinale(void)
   S_ChangeMusic(heretic_mus_cptd, true);
 }
 
-dboolean Heretic_F_Responder(event_t * event)
-{
-  if (event->type != ev_keydown)
-  {
+dboolean Heretic_F_Responder(event_t *event) {
+  if (event->type != ev_keydown) {
     return false;
   }
-  if (finalestage == 1 && gameepisode == 2)
-  {                           // we're showing the water pic, make any key kick to demo mode
+  if (finalestage == 1 &&
+      gameepisode ==
+          2) { // we're showing the water pic, make any key kick to demo mode
     finalestage++;
     return true;
   }
@@ -107,14 +104,11 @@ dboolean Heretic_F_Responder(event_t * event)
 =======================
 */
 
-void Heretic_F_Ticker(void)
-{
+void Heretic_F_Ticker(void) {
   finalecount++;
-  if (!finalestage && finalecount > strlen(finaletext) * TEXTSPEED + TEXTWAIT)
-  {
+  if (!finalestage && finalecount > strlen(finaletext) * TEXTSPEED + TEXTWAIT) {
     finalecount = 0;
-    if (!finalestage)
-    {
+    if (!finalestage) {
       finalestage = 1;
     }
   }
@@ -128,8 +122,7 @@ void Heretic_F_Ticker(void)
 =======================
 */
 
-void Heretic_F_TextWrite(void)
-{
+void Heretic_F_TextWrite(void) {
   int x, y;
   int count;
   const char *ch;
@@ -156,21 +149,18 @@ void Heretic_F_TextWrite(void)
   count = (finalecount - 10) / TEXTSPEED;
   if (count < 0)
     count = 0;
-  for (; count; count--)
-  {
+  for (; count; count--) {
     c = *ch++;
     if (!c)
       break;
-    if (c == '\n')
-    {
+    if (c == '\n') {
       cx = 20;
       cy += 9;
       continue;
     }
 
     c = toupper(c);
-    if (c < 33)
-    {
+    if (c < 33) {
       cx += 5;
       continue;
     }
@@ -192,34 +182,27 @@ void Heretic_F_TextWrite(void)
 ==================
 */
 
-void F_DemonScroll(void)
-{
+void F_DemonScroll(void) {
   const byte *p1, *p2;
   static int yval = 0;
   static int nextscroll = 0;
 
-  if (finalecount < nextscroll)
-  {
+  if (finalecount < nextscroll) {
     return;
   }
 
   p1 = W_CacheLumpName(DEH_String("FINAL1"));
   p2 = W_CacheLumpName(DEH_String("FINAL2"));
 
-  if (finalecount < 70)
-  {
+  if (finalecount < 70) {
     V_DrawRawScreen(p1);
     nextscroll = finalecount;
-  }
-  else if (yval < 200)
-  {
+  } else if (yval < 200) {
     V_DrawRawScreenSection(p2 + (200 - yval) * 320, 0, yval);
     V_DrawRawScreenSection(p1, yval, 200 - yval);
     yval++;
     nextscroll = finalecount + 3;
-  }
-  else
-  {                           //else, we'll just sit here and wait, for now
+  } else { // else, we'll just sit here and wait, for now
     V_DrawRawScreen(p2);
   }
 
@@ -235,20 +218,18 @@ void F_DemonScroll(void)
 ==================
 */
 
-void F_DrawUnderwater(void)
-{
-  switch (finalestage)
-  {
-    case 1:
-      V_SetPlayPal(playpal_heretic_e2end);
-      V_DrawRawScreen(W_CacheLumpName(DEH_String("E2END")));
-      W_UnlockLumpName(DEH_String("E2END"));
-      V_SetPlayPal(playpal_default);
+void F_DrawUnderwater(void) {
+  switch (finalestage) {
+  case 1:
+    V_SetPlayPal(playpal_heretic_e2end);
+    V_DrawRawScreen(W_CacheLumpName(DEH_String("E2END")));
+    W_UnlockLumpName(DEH_String("E2END"));
+    V_SetPlayPal(playpal_default);
 
-      break;
-    case 2:
-      V_DrawRawScreen(W_CacheLumpName(DEH_String("TITLE")));
-      W_UnlockLumpName(DEH_String("TITLE"));
+    break;
+  case 2:
+    V_DrawRawScreen(W_CacheLumpName(DEH_String("TITLE")));
+    W_UnlockLumpName(DEH_String("TITLE"));
   }
 }
 
@@ -260,38 +241,32 @@ void F_DrawUnderwater(void)
 =======================
 */
 
-void Heretic_F_Drawer(void)
-{
+void Heretic_F_Drawer(void) {
   // UpdateState |= I_FULLSCRN;
   if (!finalestage)
     Heretic_F_TextWrite();
-  else
-  {
-    switch (gameepisode)
-    {
-      case 1:
-        if (gamemode == shareware)
-        {
-          V_DrawRawScreen(W_CacheLumpName("ORDER"));
-          W_UnlockLumpName("ORDER");
-        }
-        else
-        {
-          V_DrawRawScreen(W_CacheLumpName("CREDIT"));
-          W_UnlockLumpName("CREDIT");
-        }
-        break;
-      case 2:
-        F_DrawUnderwater();
-        break;
-      case 3:
-        F_DemonScroll();
-        break;
-      case 4:            // Just show credits screen for extended episodes
-      case 5:
+  else {
+    switch (gameepisode) {
+    case 1:
+      if (gamemode == shareware) {
+        V_DrawRawScreen(W_CacheLumpName("ORDER"));
+        W_UnlockLumpName("ORDER");
+      } else {
         V_DrawRawScreen(W_CacheLumpName("CREDIT"));
         W_UnlockLumpName("CREDIT");
-        break;
+      }
+      break;
+    case 2:
+      F_DrawUnderwater();
+      break;
+    case 3:
+      F_DemonScroll();
+      break;
+    case 4: // Just show credits screen for extended episodes
+    case 5:
+      V_DrawRawScreen(W_CacheLumpName("CREDIT"));
+      W_UnlockLumpName("CREDIT");
+      break;
     }
   }
 }

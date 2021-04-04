@@ -39,32 +39,31 @@
 
 #include <stdio.h>
 
-#include <stdarg.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/time.h>
 #include <ctype.h>
 #include <signal.h>
+#include <stdarg.h>
+#include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>
+#include <unistd.h>
 
-#include "doomtype.h"
-#include "m_fixed.h"
-#include "i_system.h"
 #include "doomdef.h"
+#include "doomtype.h"
+#include "i_system.h"
+#include "m_fixed.h"
 
 #ifdef __GNUG__
 #pragma implementation "i_system.h"
 #endif
 #include "i_system.h"
 
-void I_uSleep(unsigned long usecs)
-{
+void I_uSleep(unsigned long usecs) {
 #ifdef HAVE_USLEEP
   usleep(usecs);
 #else
   /* Fall back on select(2) */
-  struct timeval tv = { usecs / 1000000, usecs % 1000000 };
-  select(0,NULL,NULL,NULL,&tv);
+  struct timeval tv = {usecs / 1000000, usecs % 1000000};
+  select(0, NULL, NULL, NULL, &tv);
 #endif
 }
 
@@ -77,8 +76,7 @@ void I_uSleep(unsigned long usecs)
 static unsigned long lasttimereply;
 static unsigned long basetime;
 
-int I_GetTime_RealTime (void)
-{
+int I_GetTime_RealTime(void) {
   struct timeval tv;
   struct timezone tz;
   unsigned long thistimereply;
@@ -89,8 +87,10 @@ int I_GetTime_RealTime (void)
 
   /* Fix for time problem */
   if (!basetime) {
-    basetime = thistimereply; thistimereply = 0;
-  } else thistimereply -= basetime;
+    basetime = thistimereply;
+    thistimereply = 0;
+  } else
+    thistimereply -= basetime;
 
   if (thistimereply < lasttimereply)
     thistimereply = lasttimereply;
@@ -103,34 +103,32 @@ int I_GetTime_RealTime (void)
  *
  * CPhipps - extracted from G_ReloadDefaults because it is O/S based
  */
-unsigned long I_GetRandomTimeSeed(void)
-{
+unsigned long I_GetRandomTimeSeed(void) {
   /* killough 3/26/98: shuffle random seed, use the clock */
   struct timeval tv;
   struct timezone tz;
-  gettimeofday(&tv,&tz);
-  return (tv.tv_sec*1000ul + tv.tv_usec/1000ul);
+  gettimeofday(&tv, &tz);
+  return (tv.tv_sec * 1000ul + tv.tv_usec / 1000ul);
 }
 
 /* cphipps - I_GetVersionString
  * Returns a version string in the given buffer
  */
-const char* I_GetVersionString(char* buf, size_t sz)
-{
-  snprintf(buf,sz,"%s v%s (https://github.com/kraflab/dsda-doom/)",PACKAGE_NAME,PACKAGE_VERSION);
+const char *I_GetVersionString(char *buf, size_t sz) {
+  snprintf(buf, sz, "%s v%s (https://github.com/kraflab/dsda-doom/)",
+           PACKAGE_NAME, PACKAGE_VERSION);
   return buf;
 }
 
 /* cphipps - I_SigString
  * Returns a string describing a signal number
  */
-const char* I_SigString(char* buf, size_t sz, int signum)
-{
+const char *I_SigString(char *buf, size_t sz, int signum) {
 #ifdef HAVE_STRSIGNAL
   if (strsignal(signum) && strlen(strsignal(signum)) < sz)
-    strcpy(buf,strsignal(signum));
+    strcpy(buf, strsignal(signum));
   else
 #endif
-    sprintf(buf,"signal %d",signum);
+    sprintf(buf, "signal %d", signum);
   return buf;
 }
