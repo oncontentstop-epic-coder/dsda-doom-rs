@@ -3,6 +3,9 @@ prboom2/release
 /build*
 /dependencies*
 
+# VS Code
+.vscode/
+
 # spec files
 analysis.txt
 levelstat.txt
