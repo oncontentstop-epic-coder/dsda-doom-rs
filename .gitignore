@@ -5,6 +5,7 @@ prboom2/release
 
 # VS Code
 .vscode/
+.cache/
 
 # spec files
 analysis.txt
